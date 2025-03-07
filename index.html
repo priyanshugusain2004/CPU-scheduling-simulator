@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU Scheduling - Select Algorithm</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="overlay">
+        <div class="container">
+            <h1>🔄 CPU Scheduling Simulator</h1>
+            <h3>Select a Scheduling Algorithm</h3>
+
+            <div class="btn-container">
+                <button class="algo-btn" onclick="navigate('fcfs')">FCFS – First Come, First Serve</button>
+                <button class="algo-btn" onclick="navigate('sjf')">SJF – Shortest Job First</button>
+                <button class="algo-btn" onclick="navigate('srtf')">SRTF – Shortest Remaining Time First</button>
+                <button class="algo-btn" onclick="navigate('rr')">Round Robin</button>
+                <button class="algo-btn" onclick="navigate('priority')">Priority Scheduling</button>
+                <button class="algo-btn" onclick="navigate('hrrn')">HRRN – Highest Response Ratio Next</button>
+                <button class="algo-btn" onclick="navigate('mqs')">Multiple Queue Scheduling</button>
+                <button class="algo-btn" onclick="navigate('mlfq')">Multilevel Feedback Queue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🟢 Animated Color-Changing Moving Circles -->
+    <div class="loop loop-1"></div>
+    <div class="loop loop-2"></div>
+    <div class="loop loop-3"></div>
+    <div class="loop loop-4"></div>
+    <div class="loop loop-5"></div>
+    <div class="loop loop-6"></div>
+    <div class="loop loop-7"></div>
+    <div class="loop loop-8"></div>
+    <div class="loop loop-9"></div>
+    <div class="loop loop-10"></div>
+
+    <script>
+        function navigate(algo) {
+            window.location.href = `simulator.html?algorithm=${algo}`;
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,115 @@
+/* 🎨 Full-Screen Background */
+body {
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 🔹 Transparent Overlay */
+.overlay {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* 🌟 Main Container */
+.container {
+    width: 60%;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    transition: transform 0.3s ease-in-out;
+}
+
+.container:hover {
+    transform: scale(1.02);
+}
+
+/* 🎛️ Algorithm Selection Buttons */
+.btn-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* 🟢 Animated Buttons */
+.algo-btn {
+    background: linear-gradient(135deg, #00ff99, #66ffcc);
+    color: #333;
+    padding: 15px 25px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.algo-btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #00cc88, #33ffbb);
+    color: white;
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 🔥 Moving Circles with Color Change */
+.loop {
+    position: absolute;
+    border: 3px solid;
+    border-radius: 50%;
+    animation: moveLoop 4s infinite alternate ease-in-out, colorChange 6s infinite alternate;
+    opacity: 0.8;
+}
+
+/* 🟢 Different Sizes & Positions */
+.loop-1 { width: 80px; height: 80px; top: 10%; left: 5%; animation-duration: 3s, 6s; }
+.loop-2 { width: 120px; height: 120px; bottom: 15%; right: 8%; animation-duration: 4s, 6.5s; }
+.loop-3 { width: 150px; height: 150px; top: 50%; left: 3%; animation-duration: 5s, 5s; }
+.loop-4 { width: 100px; height: 100px; top: 40%; right: 5%; animation-duration: 3.5s, 5.5s; }
+.loop-5 { width: 130px; height: 130px; bottom: 10%; left: 10%; animation-duration: 4.5s, 6s; }
+.loop-6 { width: 90px; height: 90px; top: 20%; right: 20%; animation-duration: 3s, 4.5s; }
+.loop-7 { width: 110px; height: 110px; bottom: 30%; left: 30%; animation-duration: 5s, 6.2s; }
+.loop-8 { width: 140px; height: 140px; top: 70%; right: 10%; animation-duration: 4s, 5.8s; }
+.loop-9 { width: 100px; height: 100px; top: 5%; left: 50%; animation-duration: 3.2s, 5.6s; }
+.loop-10 { width: 120px; height: 120px; bottom: 5%; right: 50%; animation-duration: 4.8s, 5.4s; }
+
+/* 🔄 Moving Animation (Clockwise & Anticlockwise) */
+@keyframes moveLoop {
+    0% {
+        transform: translate(0px, 0px) scale(1) rotate(0deg);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(30px, -30px) scale(1.2) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-30px, 30px) scale(1) rotate(360deg);
+        opacity: 0.8;
+    }
+}
+
+/* 🎨 Color Changing Animation */
+@keyframes colorChange {
+    0% { border-color: rgba(0, 255, 0, 0.8); } /* Green */
+    50% { border-color: rgba(0, 128, 255, 0.8); } /* Blue */
+    100% { border-color: rgba(255, 0, 255, 0.8); } /* Purple */
+}
