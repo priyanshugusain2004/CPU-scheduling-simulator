@@ -3,28 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multilevel Feedback Queue (MLFQ) Scheduling</title>
-    <link rel="stylesheet" href="styles/MLFQ.css">
+    <title>MLFQ Animation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Glowing Container */
+        .container {
+            width: 90%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 162, 255, 0.8);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .info {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #ffeb3b;
+        }
+
+        .input-container {
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .queue-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .queue {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress {
+            position: absolute;
+            height: 100%;
+            background: #ff9800;
+            width: 0%;
+            transition: width 2s linear;
+        }
+
+        .queue span {
+            z-index: 2;
+            position: relative;
+        }
+
+        .btn {
+            background: #ff5722;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #e64a19;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4caf50;
+        }
+
+        .home-btn {
+            background: #2196F3;
+            margin-top: 20px;
+        }
+
+        .home-btn:hover {
+            background: #1976D2;
+        }
+
+        /* Bubbles Effect */
+        .bubble {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 255, 0, 0.8);
+            opacity: 0.6;
+            bottom: -50px;
+            animation: moveBubbles 8s infinite linear, colorChange 4s infinite alternate;
+        }
+
+        @keyframes moveBubbles {
+            0% { transform: translateY(0px); opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        @keyframes colorChange {
+            0% { background: rgba(0, 255, 0, 0.8); }
+            25% { background: rgba(0, 128, 255, 0.8); }
+            50% { background: rgba(255, 0, 255, 0.8); }
+            75% { background: rgba(255, 165, 0, 0.8); }
+            100% { background: rgba(255, 0, 0, 0.8); }
+        }
+    </style>
 </head>
 <body>
-
     <div class="container">
-        <h1 class="title">🔄 Multilevel Feedback Queue (MLFQ)</h1>
-        <p class="subtitle">
-            MLFQ is a CPU scheduling algorithm that allows processes to move between multiple queues with different priority levels.
-            It is useful for dynamically adjusting priorities based on process behavior.
-        </p>
+        <h1>Multilevel Feedback Queue (MLFQ) Simulation</h1>
+        <p class="info">MLFQ is a scheduling algorithm where processes move between multiple queues based on priority. Higher priority processes run first, and long-running processes are demoted.</p>
 
-        <div class="mlfq-container">
-            <div class="queue" id="queue1">Queue 1 (High Priority - RR)</div>
-            <div class="queue" id="queue2">Queue 2 (Medium Priority - RR)</div>
-            <div class="queue" id="queue3">Queue 3 (Low Priority - FCFS)</div>
+        <div class="input-container">
+            <input type="text" id="processName" placeholder="Enter Process Name">
+            <select id="processPriority">
+                <option value="1">Priority 1 (High)</option>
+                <option value="2">Priority 2 (Medium)</option>
+                <option value="3">Priority 3 (Low)</option>
+            </select>
+            <button class="btn" onclick="addProcess()">➕ Add Process</button>
         </div>
 
-        <button class="algo-btn" onclick="startSimulation()">▶ Start Simulation</button>
-        <a href="index.html" class="algo-btn">⬅ Back to Menu</a>
+        <div class="queue-container" id="queueContainer"></div>
+
+        <button class="btn" onclick="deleteProcess()">❌ Delete Process</button>
+        <button class="btn" onclick="startMLFQ()">▶ Start Simulation</button>
+        <button class="btn" onclick="stopMLFQ()">⏹ Stop Simulation</button>
+
+        <p class="status" id="statusMessage">Waiting for processes...</p>
+        
+        <button class="btn home-btn" onclick="goHome()">🏠 Home</button>
     </div>
 
-    <script src="js/mlfq.js"></script>
+    <script>
+        let intervals = [];
+
+        function addProcess() {
+            let processName = document.getElementById("processName").value.trim();
+            let priority = document.getElementById("processPriority").value;
+
+            if (!processName) {
+                alert("Please enter a process name!");
+                return;
+            }
+
+            let queueDiv = document.createElement("div");
+            queueDiv.classList.add("queue");
+            queueDiv.dataset.priority = priority;
+            queueDiv.innerHTML = `<div class="progress"></div>
+                                  <span>${processName} (Priority ${priority})</span>`;
+            document.getElementById("queueContainer").appendChild(queueDiv);
+        }
+
+        function deleteProcess() {
+            let container = document.getElementById("queueContainer");
+            if (container.lastChild) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        function startMLFQ() {
+            let queues = Array.from(document.querySelectorAll(".queue"));
+            queues.sort((a, b) => a.dataset.priority - b.dataset.priority);
+            
+            let delay = 0;
+            stopMLFQ();
+            document.getElementById("statusMessage").innerText = "🚀 Running MLFQ Simulation...";
+
+            queues.forEach((queue, index) => {
+                let progress = queue.querySelector(".progress");
+                let priority = parseInt(queue.dataset.priority);
+
+                let timeout = setTimeout(() => {
+                    progress.style.width = "100%";
+                    setTimeout(() => {
+                        if (priority < 3) { 
+                            queue.dataset.priority = priority + 1;
+                            queue.querySelector("span").innerText = queue.querySelector("span").innerText.replace(`Priority ${priority}`, `Priority ${priority + 1}`);
+                            progress.style.width = "0%";
+                        }
+                    }, 2000);
+                }, delay);
+                intervals.push(timeout);
+                delay += 2000;
+            });
+
+            setTimeout(() => {
+                document.getElementById("statusMessage").innerText = "✅ Simulation Completed!";
+            }, delay);
+        }
+
+        function stopMLFQ() {
+            intervals.forEach(clearTimeout);
+            intervals = [];
+            document.querySelectorAll(".queue .progress").forEach(progress => {
+                progress.style.width = "0%";
+            });
+            document.getElementById("statusMessage").innerText = "⏹ Simulation Stopped!";
+        }
+
+        function goHome() {
+            window.location.href = "index.html";
+        }
+
+        function createBubbles() {
+            for (let i = 0; i < 20; i++) {
+                let bubble = document.createElement("div");
+                bubble.classList.add("bubble");
+                document.body.appendChild(bubble);
+                bubble.style.left = `${Math.random() * window.innerWidth}px`;
+                bubble.style.width = bubble.style.height = `${Math.random() * 40 + 10}px`;
+                bubble.style.animationDuration = `${Math.random() * 5 + 3}s`;
+            }
+        }
+
+        createBubbles();
+    </script>
 </body>
 </html>

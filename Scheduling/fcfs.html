@@ -18,26 +18,45 @@
             justify-content: center;
             height: 100vh;
             text-align: center;
+            overflow: hidden;
+            position: relative;
         }
+
+        /* Glowing Container */
         .container {
-            width: 80%;
+            width: 90%;
             max-width: 800px;
-            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(0, 162, 255, 0.8); /* Blue glow */
+            position: relative;
+            z-index: 10;
         }
+
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
+
+        .info {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            color: #ffeb3b;
+        }
+
         .process-container {
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
+            margin-bottom: 20px;
         }
+
         .process {
             width: 100%;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.2);
             padding: 10px;
             border-radius: 5px;
             display: flex;
@@ -46,6 +65,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .progress {
             position: absolute;
             height: 100%;
@@ -53,10 +73,12 @@
             width: 0%;
             transition: width 2s linear;
         }
+
         .process span {
             z-index: 2;
             position: relative;
         }
+
         .btn {
             background: #ff5722;
             color: white;
@@ -65,32 +87,83 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 1rem;
-            margin: 10px;
+            margin: 5px;
+            transition: 0.3s;
         }
+
         .btn:hover {
             background: #e64a19;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #4caf50;
+        }
+
+        .home-btn {
+            background: #2196F3;
+            margin-top: 20px;
+        }
+
+        .home-btn:hover {
+            background: #1976D2;
+        }
+
+        /* Bubbles Effect */
+        .bubble {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 255, 0, 0.8);
+            opacity: 0.6;
+            bottom: -50px; /* Start from the bottom */
+            animation: moveBubbles 8s infinite linear, colorChange 4s infinite alternate;
+        }
+
+        @keyframes moveBubbles {
+            0% { transform: translateY(0px); opacity: 1; }
+            100% { transform: translateY(-100vh); opacity: 0; } /* Move up fully */
+        }
+
+        @keyframes colorChange {
+            0% { background: rgba(0, 255, 0, 0.8); } /* Green */
+            25% { background: rgba(0, 128, 255, 0.8); } /* Blue */
+            50% { background: rgba(255, 0, 255, 0.8); } /* Purple */
+            75% { background: rgba(255, 165, 0, 0.8); } /* Orange */
+            100% { background: rgba(255, 0, 0, 0.8); } /* Red */
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>First Come First Serve (FCFS) Animation</h1>
+        <p class="info">FCFS is a scheduling algorithm where the first process to arrive gets executed first. This animation demonstrates how processes are executed in the order they arrive.</p>
+
         <div class="process-container" id="processContainer"></div>
-        <button class="btn" onclick="addProcess()">Add Process</button>
-        <button class="btn" onclick="deleteProcess()">Delete Process</button>
-        <button class="btn" onclick="startFCFS()">Start Simulation</button>
-        <button class="btn" onclick="stopFCFS()">Stop Simulation</button>
+
+        <button class="btn" onclick="addProcess()">➕ Add Process</button>
+        <button class="btn" onclick="deleteProcess()">❌ Delete Process</button>
+        <button class="btn" onclick="startFCFS()">▶ Start Simulation</button>
+        <button class="btn" onclick="stopFCFS()">⏹ Stop Simulation</button>
+
+        <p class="status" id="statusMessage">Waiting for processes...</p>
+
+        <button class="btn home-btn" onclick="goHome()">🏠 Home</button>
     </div>
 
     <script>
         let processCounter = 0;
         let intervals = [];
-        
+
         function addProcess() {
             processCounter++;
             let processDiv = document.createElement("div");
             processDiv.classList.add("process");
-            processDiv.innerHTML = `<div class="progress" id="progress${processCounter}"></div><span>Process ${processCounter}</span>`;
+            processDiv.innerHTML = `<div class="progress" id="progress${processCounter}"></div>
+                                    <span>Process ${processCounter}</span>`;
             document.getElementById("processContainer").appendChild(processDiv);
         }
 
@@ -106,6 +179,8 @@
             let processes = document.querySelectorAll(".process .progress");
             let delay = 0;
             stopFCFS(); // Clear previous intervals
+            document.getElementById("statusMessage").innerText = "🚀 Running FCFS Simulation...";
+
             processes.forEach((progress, index) => {
                 let timeout = setTimeout(() => {
                     progress.style.width = "100%";
@@ -113,6 +188,10 @@
                 intervals.push(timeout);
                 delay += 2000;
             });
+
+            setTimeout(() => {
+                document.getElementById("statusMessage").innerText = "✅ Simulation Completed!";
+            }, delay);
         }
 
         function stopFCFS() {
@@ -121,7 +200,32 @@
             document.querySelectorAll(".process .progress").forEach(progress => {
                 progress.style.width = "0%";
             });
+            document.getElementById("statusMessage").innerText = "⏹ Simulation Stopped!";
         }
+
+        function goHome() {
+            window.location.href = "index.html"; // Ensure index.html exists
+        }
+
+        // Generate Bubbles
+        function createBubbles() {
+            for (let i = 0; i < 20; i++) { // Increased number of bubbles
+                let bubble = document.createElement("div");
+                bubble.classList.add("bubble");
+                document.body.appendChild(bubble);
+
+                let x = Math.random() * window.innerWidth;
+                let size = Math.random() * 40 + 10;
+                let duration = Math.random() * 5 + 3; // Different speeds
+
+                bubble.style.left = `${x}px`;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.animationDuration = `${duration}s`; // Randomize speed
+            }
+        }
+
+        createBubbles();
     </script>
 </body>
 </html>
