@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilevel Feedback Queue (MLFQ) Scheduling</title>
+    <link rel="stylesheet" href="styles/MLFQ.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="title">🔄 Multilevel Feedback Queue (MLFQ)</h1>
+        <p class="subtitle">
+            MLFQ is a CPU scheduling algorithm that allows processes to move between multiple queues with different priority levels.
+            It is useful for dynamically adjusting priorities based on process behavior.
+        </p>
+
+        <div class="mlfq-container">
+            <div class="queue" id="queue1">Queue 1 (High Priority - RR)</div>
+            <div class="queue" id="queue2">Queue 2 (Medium Priority - RR)</div>
+            <div class="queue" id="queue3">Queue 3 (Low Priority - FCFS)</div>
+        </div>
+
+        <button class="algo-btn" onclick="startSimulation()">▶ Start Simulation</button>
+        <a href="index.html" class="algo-btn">⬅ Back to Menu</a>
+    </div>
+
+    <script src="js/mlfq.js"></script>
+</body>
+</html>

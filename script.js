@@ -1,90 +1,33 @@
-let processes = [];
-let selectedAlgorithm = "fcfs";
+document.addEventListener("DOMContentLoaded", function () {
+    const body = document.body;
 
-function selectAlgorithm() {
-    selectedAlgorithm = document.getElementById("schedulingAlgorithm").value;
-    alert("Selected Algorithm: " + selectedAlgorithm.toUpperCase());
-}
+    function spawnCircle() {
+        const circle = document.createElement("div");
+        circle.classList.add("moving-circle");
 
-function toggleTimeQuantum() {
-    let algo = document.getElementById("schedulingAlgorithm").value;
-    document.getElementById("timeQuantumLabel").style.display = (algo === "roundRobin" || algo === "mlfq") ? "inline" : "none";
-    document.getElementById("timeQuantum").style.display = (algo === "roundRobin" || algo === "mlfq") ? "inline" : "none";
+        // Random size
+        const size = Math.random() * 50 + 30;
+        circle.style.width = `${size}px`;
+        circle.style.height = `${size}px`;
 
-    document.getElementById("priorityLabel").style.display = (algo === "priority") ? "inline" : "none";
-    document.getElementById("priority").style.display = (algo === "priority") ? "inline" : "none";
-}
+        // Random position
+        const posX = Math.random() * window.innerWidth;
+        const posY = Math.random() * window.innerHeight;
+        circle.style.left = `${posX}px`;
+        circle.style.top = `${posY}px`;
 
-function addProcess() {
-    let processId = document.getElementById("processId").value;
-    let arrivalTime = parseInt(document.getElementById("arrivalTime").value);
-    let burstTime = parseInt(document.getElementById("burstTime").value);
-    let priority = document.getElementById("priority").value ? parseInt(document.getElementById("priority").value) : null;
+        // Random color
+        const colors = ["rgba(0, 255, 0, 0.6)", "rgba(0, 128, 255, 0.6)", "rgba(255, 0, 255, 0.6)", "rgba(255, 165, 0, 0.6)"];
+        circle.style.background = colors[Math.floor(Math.random() * colors.length)];
 
-    if (processId && !isNaN(arrivalTime) && !isNaN(burstTime)) {
-        let process = { processId, arrivalTime, burstTime, priority };
-        processes.push(process);
-        displayProcesses();
-    } else {
-        alert("Please enter valid process details.");
-    }
-}
+        body.appendChild(circle);
 
-function deleteProcess(index) {
-    processes.splice(index, 1);
-    displayProcesses();
-}
-
-function displayProcesses() {
-    let table = document.getElementById("processTable");
-    table.innerHTML = "";
-    processes.forEach((p, index) => {
-        let row = `<tr>
-            <td>${p.processId}</td>
-            <td>${p.arrivalTime}</td>
-            <td>${p.burstTime}</td>
-            <td>${p.priority !== null ? p.priority : '-'}</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-            <td><button class="delete-btn" onclick="deleteProcess(${index})">🗑️</button></td>
-        </tr>`;
-        table.innerHTML += row;
-    });
-}
-
-function runScheduling() {
-    let ganttChart = document.getElementById("ganttChart");
-    let timeline = document.getElementById("timeline");
-    
-    ganttChart.innerHTML = "";
-    timeline.innerHTML = "";
-
-    let totalTime = processes.reduce((sum, p) => sum + p.burstTime, 0);
-    let currentTime = 0;
-
-    processes.forEach((p, index) => {
-        let widthPercent = (p.burstTime / totalTime) * 100;
-        let bar = document.createElement("div");
-        bar.classList.add("gantt-bar", `p${index % 5 + 1}`);
-        bar.style.width = "0%";
-        bar.innerText = p.processId;
-
-        ganttChart.appendChild(bar);
-
-        let timeLabel = document.createElement("span");
-        timeLabel.innerText = currentTime;
-        timeline.appendChild(timeLabel);
-
+        // Remove circle after animation
         setTimeout(() => {
-            bar.style.width = `${widthPercent}%`;
-        }, currentTime * 1000);
-        
-        currentTime += p.burstTime;
-    });
+            circle.remove();
+        }, 6000);
+    }
 
-    let finalTimeLabel = document.createElement("span");
-    finalTimeLabel.innerText = currentTime;
-    timeline.appendChild(finalTimeLabel);
-}
+    // Spawn circles at an interval
+    setInterval(spawnCircle, 500);
+});

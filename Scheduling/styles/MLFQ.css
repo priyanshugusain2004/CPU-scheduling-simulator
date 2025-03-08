@@ -1,0 +1,26 @@
+/* 📌 Multilevel Feedback Queue Styles */
+.mlfq-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.queue {
+    width: 80%;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid white;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 50px;
+    font-size: 1.2rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+#queue1 { border-color: cyan; }
+#queue2 { border-color: orange; }
+#queue3 { border-color: red; }
