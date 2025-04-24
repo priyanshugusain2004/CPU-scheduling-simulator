@@ -1,262 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLFQ Animation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #141e30, #243b55);
-            color: white;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-            overflow: hidden;
-            position: relative;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MLFQ Scheduling</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      text-align: center;
+    }
 
-        /* Glowing Container */
-        .container {
-            width: 90%;
-            max-width: 900px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 20px rgba(0, 162, 255, 0.8);
-            position: relative;
-            z-index: 10;
-        }
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #00bcd4;
+      width: 90%;
+      max-width: 800px;
+      z-index: 2;
+    }
 
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
+    h1 {
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
 
-        .info {
-            font-size: 1rem;
-            margin-bottom: 15px;
-            color: #ffeb3b;
-        }
+    .info {
+      color: #ffeb3b;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
 
-        .input-container {
-            margin-bottom: 15px;
-        }
+    input {
+      padding: 8px;
+      width: 100px;
+      border-radius: 5px;
+      border: none;
+      margin: 5px;
+    }
 
-        input, select {
-            padding: 8px;
-            margin: 5px;
-            border-radius: 5px;
-            border: none;
-            font-size: 1rem;
-        }
+    .btn {
+      background: #ff5722;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-        .queue-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    .btn:hover {
+      background: #e64a19;
+    }
 
-        .queue {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 10px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-        }
+    .process-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
 
-        .progress {
-            position: absolute;
-            height: 100%;
-            background: #ff9800;
-            width: 0%;
-            transition: width 2s linear;
-        }
+    .process {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 5px;
+      position: relative;
+      overflow: hidden;
+    }
 
-        .queue span {
-            z-index: 2;
-            position: relative;
-        }
+    .progress {
+      position: absolute;
+      height: 100%;
+      background: #4caf50;
+      width: 0%;
+      top: 0;
+      left: 0;
+      transition: width 0.4s linear;
+    }
 
-        .btn {
-            background: #ff5722;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            margin: 5px;
-            transition: 0.3s;
-        }
+    .status {
+      margin-top: 15px;
+      color: #4caf50;
+      font-weight: bold;
+    }
 
-        .btn:hover {
-            background: #e64a19;
-        }
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.6;
+      bottom: -50px;
+      animation: floatUp 10s infinite linear, colorPulse 4s infinite alternate;
+    }
 
-        .status {
-            margin-top: 10px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #4caf50;
-        }
+    @keyframes floatUp {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-100vh); opacity: 0; }
+    }
 
-        .home-btn {
-            background: #2196F3;
-            margin-top: 20px;
-        }
-
-        .home-btn:hover {
-            background: #1976D2;
-        }
-
-        /* Bubbles Effect */
-        .bubble {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: rgba(0, 255, 0, 0.8);
-            opacity: 0.6;
-            bottom: -50px;
-            animation: moveBubbles 8s infinite linear, colorChange 4s infinite alternate;
-        }
-
-        @keyframes moveBubbles {
-            0% { transform: translateY(0px); opacity: 1; }
-            100% { transform: translateY(-100vh); opacity: 0; }
-        }
-
-        @keyframes colorChange {
-            0% { background: rgba(0, 255, 0, 0.8); }
-            25% { background: rgba(0, 128, 255, 0.8); }
-            50% { background: rgba(255, 0, 255, 0.8); }
-            75% { background: rgba(255, 165, 0, 0.8); }
-            100% { background: rgba(255, 0, 0, 0.8); }
-        }
-    </style>
+    @keyframes colorPulse {
+      0% { background: rgba(0,255,0,0.8); }
+      25% { background: rgba(0,128,255,0.8); }
+      50% { background: rgba(255,0,255,0.8); }
+      75% { background: rgba(255,165,0,0.8); }
+      100% { background: rgba(255,0,0,0.8); }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Multilevel Feedback Queue (MLFQ) Simulation</h1>
-        <p class="info">MLFQ is a scheduling algorithm where processes move between multiple queues based on priority. Higher priority processes run first, and long-running processes are demoted.</p>
+  <div class="container">
+    <h1>Multilevel Feedback Queue (MLFQ)</h1>
+    <p class="info">3 Queues with Time Quanta: Q1=4, Q2=8, Q3=FCFS</p>
+    <input type="number" id="burstInput" placeholder="Burst Time">
+    <button class="btn" onclick="addProcess()">➕ Add Process</button>
+    <button class="btn" onclick="startMLFQ()">▶ Start Simulation</button>
+    <button class="btn" onclick="reset()">🔄 Reset</button>
+    <button class="btn" onclick="goHome()">🏠 Home</button>
 
-        <div class="input-container">
-            <input type="text" id="processName" placeholder="Enter Process Name">
-            <select id="processPriority">
-                <option value="1">Priority 1 (High)</option>
-                <option value="2">Priority 2 (Medium)</option>
-                <option value="3">Priority 3 (Low)</option>
-            </select>
-            <button class="btn" onclick="addProcess()">➕ Add Process</button>
-        </div>
+    <div class="process-container" id="processContainer"></div>
+    <div class="status" id="statusMessage">Waiting for input...</div>
+  </div>
 
-        <div class="queue-container" id="queueContainer"></div>
+  <script>
+    let processes = [];
+    let container = document.getElementById("processContainer");
+    let status = document.getElementById("statusMessage");
 
-        <button class="btn" onclick="deleteProcess()">❌ Delete Process</button>
-        <button class="btn" onclick="startMLFQ()">▶ Start Simulation</button>
-        <button class="btn" onclick="stopMLFQ()">⏹ Stop Simulation</button>
+    function addProcess() {
+      const burstTime = parseInt(document.getElementById("burstInput").value);
+      if (isNaN(burstTime) || burstTime <= 0) {
+        alert("Enter a valid burst time.");
+        return;
+      }
+      const id = processes.length + 1;
+      const process = {
+        id,
+        burstTime,
+        remainingTime: burstTime,
+        currentQueue: 1
+      };
+      processes.push(process);
 
-        <p class="status" id="statusMessage">Waiting for processes...</p>
-        
-        <button class="btn home-btn" onclick="goHome()">🏠 Home</button>
-    </div>
+      const div = document.createElement("div");
+      div.className = "process";
+      div.id = `process${id}`;
+      div.innerHTML = `<div class="progress" id="progress${id}"></div><span>Process ${id} | BT: ${burstTime}</span>`;
+      container.appendChild(div);
+    }
 
-    <script>
-        let intervals = [];
-
-        function addProcess() {
-            let processName = document.getElementById("processName").value.trim();
-            let priority = document.getElementById("processPriority").value;
-
-            if (!processName) {
-                alert("Please enter a process name!");
-                return;
-            }
-
-            let queueDiv = document.createElement("div");
-            queueDiv.classList.add("queue");
-            queueDiv.dataset.priority = priority;
-            queueDiv.innerHTML = `<div class="progress"></div>
-                                  <span>${processName} (Priority ${priority})</span>`;
-            document.getElementById("queueContainer").appendChild(queueDiv);
+    async function startMLFQ() {
+      status.innerText = "🚀 Running MLFQ Simulation...";
+      for (let q = 1; q <= 3; q++) {
+        let quantum = q === 1 ? 4 : q === 2 ? 8 : Infinity;
+        let queue = processes.filter(p => p.currentQueue === q && p.remainingTime > 0);
+        while (queue.length > 0) {
+          for (let i = 0; i < queue.length; i++) {
+            let p = queue[i];
+            let execTime = Math.min(p.remainingTime, quantum);
+            await runProcess(p.id, p.burstTime, p.remainingTime, execTime);
+            p.remainingTime -= execTime;
+            if (p.remainingTime > 0 && p.currentQueue < 3) p.currentQueue++;
+          }
+          queue = processes.filter(p => p.currentQueue === q && p.remainingTime > 0);
         }
+      }
+      status.innerText = "✅ Simulation Completed!";
+    }
 
-        function deleteProcess() {
-            let container = document.getElementById("queueContainer");
-            if (container.lastChild) {
-                container.removeChild(container.lastChild);
-            }
-        }
+    function runProcess(id, total, remaining, time) {
+      return new Promise(resolve => {
+        const percent = ((total - remaining + time) / total) * 100;
+        const bar = document.getElementById("progress" + id);
+        let width = ((total - remaining) / total) * 100;
+        let step = (percent - width) / (time * 10);
+        let interval = setInterval(() => {
+          width += step;
+          if (width >= percent) {
+            width = percent;
+            clearInterval(interval);
+            resolve();
+          }
+          bar.style.width = width + "%";
+        }, 100);
+      });
+    }
 
-        function startMLFQ() {
-            let queues = Array.from(document.querySelectorAll(".queue"));
-            queues.sort((a, b) => a.dataset.priority - b.dataset.priority);
-            
-            let delay = 0;
-            stopMLFQ();
-            document.getElementById("statusMessage").innerText = "🚀 Running MLFQ Simulation...";
+    function reset() {
+      processes = [];
+      container.innerHTML = "";
+      status.innerText = "Reset complete.";
+    }
 
-            queues.forEach((queue, index) => {
-                let progress = queue.querySelector(".progress");
-                let priority = parseInt(queue.dataset.priority);
+    function goHome() {
+      window.location.href = "../index.html";
+    }
 
-                let timeout = setTimeout(() => {
-                    progress.style.width = "100%";
-                    setTimeout(() => {
-                        if (priority < 3) { 
-                            queue.dataset.priority = priority + 1;
-                            queue.querySelector("span").innerText = queue.querySelector("span").innerText.replace(`Priority ${priority}`, `Priority ${priority + 1}`);
-                            progress.style.width = "0%";
-                        }
-                    }, 2000);
-                }, delay);
-                intervals.push(timeout);
-                delay += 2000;
-            });
+    function createBubbles() {
+      for (let i = 0; i < 30; i++) {
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        const size = Math.random() * 40 + 10;
+        bubble.style.width = size + "px";
+        bubble.style.height = size + "px";
+        bubble.style.left = Math.random() * window.innerWidth + "px";
+        bubble.style.animationDuration = (Math.random() * 5 + 4) + "s";
+        document.body.appendChild(bubble);
+      }
+    }
 
-            setTimeout(() => {
-                document.getElementById("statusMessage").innerText = "✅ Simulation Completed!";
-            }, delay);
-        }
-
-        function stopMLFQ() {
-            intervals.forEach(clearTimeout);
-            intervals = [];
-            document.querySelectorAll(".queue .progress").forEach(progress => {
-                progress.style.width = "0%";
-            });
-            document.getElementById("statusMessage").innerText = "⏹ Simulation Stopped!";
-        }
-
-        function goHome() {
-            window.location.href = "../index.html";
-        }
-
-        function createBubbles() {
-            for (let i = 0; i < 20; i++) {
-                let bubble = document.createElement("div");
-                bubble.classList.add("bubble");
-                document.body.appendChild(bubble);
-                bubble.style.left = `${Math.random() * window.innerWidth}px`;
-                bubble.style.width = bubble.style.height = `${Math.random() * 40 + 10}px`;
-                bubble.style.animationDuration = `${Math.random() * 5 + 3}s`;
-            }
-        }
-
-        createBubbles();
-    </script>
+    createBubbles();
+  </script>
 </body>
 </html>

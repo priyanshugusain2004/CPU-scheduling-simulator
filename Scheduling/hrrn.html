@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HRRN Scheduling Simulation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #141e30, #243b55);
+      color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    .container {
+      width: 90%;
+      max-width: 800px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 20px rgba(0, 162, 255, 0.8);
+      z-index: 10;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    .info {
+      font-size: 1rem;
+      margin-bottom: 20px;
+      color: #ffeb3b;
+    }
+    .process-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .process {
+      position: relative;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+    }
+    .progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background-color: #4caf50;
+      z-index: 0;
+      transition: width 0.5s linear;
+    }
+    .process span {
+      z-index: 1;
+      position: relative;
+    }
+    input {
+      margin: 5px;
+      padding: 5px;
+      border-radius: 5px;
+      border: none;
+      width: 100px;
+    }
+    .btn {
+      background-color: #ff5722;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background-color: #e64a19;
+    }
+    .status {
+      font-weight: bold;
+      color: #00e676;
+      margin-top: 15px;
+    }
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.6;
+      bottom: -50px;
+      animation: moveBubbles 10s linear infinite, colorChange 5s ease-in-out infinite alternate;
+    }
+    @keyframes moveBubbles {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-100vh); opacity: 0; }
+    }
+    @keyframes colorChange {
+      0% { background: rgba(255, 0, 0, 0.6); }
+      25% { background: rgba(0, 255, 255, 0.6); }
+      50% { background: rgba(255, 255, 0, 0.6); }
+      75% { background: rgba(0, 255, 0, 0.6); }
+      100% { background: rgba(255, 0, 255, 0.6); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>HRRN Scheduling</h1>
+    <p class="info">Add burst and arrival times. HRRN selects the process with the highest response ratio.</p>
+    
+    <input type="number" id="burst" placeholder="Burst Time" min="1">
+    <input type="number" id="arrival" placeholder="Arrival Time" min="0">
+    <button class="btn" onclick="addProcess()">➕ Add Process</button>
+    <button class="btn" onclick="startSimulation()">▶ Start</button>
+    <button class="btn" onclick="resetSimulation()">🔄 Reset</button>
+    <button class="btn" onclick="goHome()">🏠 Home</button>
+    
+    <div class="process-container" id="processContainer"></div>
+    <p class="status" id="statusMessage">Waiting for input...</p>
+  </div>
+
+  <script>
+    let processes = [];
+    let currentTime = 0;
+    let running = false;
+
+    function addProcess() {
+      const burst = parseInt(document.getElementById("burst").value);
+      const arrival = parseInt(document.getElementById("arrival").value);
+      if (isNaN(burst) || isNaN(arrival)) return;
+
+      const id = processes.length + 1;
+      const process = { id, burst, arrival, remaining: burst, done: false };
+      processes.push(process);
+
+      const div = document.createElement("div");
+      div.className = "process";
+      div.id = `p${id}`;
+      div.innerHTML = `<div class="progress" id="progress${id}"></div>
+                       <span>Process ${id} | Burst: ${burst}, Arrival: ${arrival}</span>`;
+      document.getElementById("processContainer").appendChild(div);
+
+      document.getElementById("burst").value = '';
+      document.getElementById("arrival").value = '';
+    }
+
+    function startSimulation() {
+      if (running || processes.length === 0) return;
+      running = true;
+      document.getElementById("statusMessage").innerText = "🚀 Running HRRN Simulation...";
+      simulateHRRN();
+    }
+
+    async function simulateHRRN() {
+      processes.sort((a, b) => a.arrival - b.arrival);
+      let completed = 0;
+
+      while (completed < processes.length) {
+        let readyQueue = processes.filter(p => !p.done && p.arrival <= currentTime);
+        if (readyQueue.length === 0) {
+          currentTime++;
+          await sleep(500);
+          continue;
+        }
+
+        readyQueue.forEach(p => {
+          p.responseRatio = ((currentTime - p.arrival) + p.burst) / p.burst;
+        });
+
+        readyQueue.sort((a, b) => b.responseRatio - a.responseRatio);
+        let current = readyQueue[0];
+
+        await animateProcess(current);
+        current.done = true;
+        completed++;
+        currentTime += current.burst;
+      }
+
+      document.getElementById("statusMessage").innerText = "✅ HRRN Simulation Completed!";
+      running = false;
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function animateProcess(process) {
+      let bar = document.getElementById(`progress${process.id}`);
+      for (let i = 1; i <= 100; i++) {
+        bar.style.width = `${i}%`;
+        await sleep(process.burst * 10); // Adjust speed
+      }
+    }
+
+    function resetSimulation() {
+      processes = [];
+      currentTime = 0;
+      running = false;
+      document.getElementById("processContainer").innerHTML = "";
+      document.getElementById("statusMessage").innerText = "Waiting for input...";
+    }
+
+    function goHome() {
+            window.location.href = "../index.html";
+        }
+
+    // Floating Bubbles
+    function createBubbles() {
+      for (let i = 0; i < 25; i++) {
+        let bubble = document.createElement("div");
+        bubble.classList.add("bubble");
+        let size = Math.random() * 40 + 10;
+        let x = Math.random() * window.innerWidth;
+        let duration = Math.random() * 10 + 5;
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+        bubble.style.left = `${x}px`;
+        bubble.style.animationDuration = `${duration}s`;
+        document.body.appendChild(bubble);
+      }
+    }
+
+    createBubbles();
+  </script>
+</body>
+</html>
